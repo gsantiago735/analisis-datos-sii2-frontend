@@ -1,0 +1,23 @@
+FROM node:lts-alpine
+
+WORKDIR /app
+
+# Copiar archivos de dependencias
+COPY package.json package-lock.json* pnpm-lock.yaml* bun.lockb* ./
+
+# Instalar dependencias según el gestor que elegiste
+RUN \
+  if [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm i; \
+  elif [ -f bun.lockb ]; then id -u bun &>/dev/null || adduser -D bun && chown -R bun /app && npm install -g bun && bun install; \
+  elif [ -f package-lock.json ]; then npm ci; \
+  else npm install; \
+  fi
+
+# Copiar el resto del código
+COPY . .
+
+# Exponer el puerto por defecto de Next.js
+EXPOSE 3000
+
+# Comando para desarrollo
+CMD ["npm", "run", "dev"]
