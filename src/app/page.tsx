@@ -1,17 +1,14 @@
 import React from 'react';
+import axios from 'axios';
 
 // Función para obtener los datos desde el backend de Docker
 async function getBackendData() {
   try {
-    // 💡 CLAVE: Usamos 'http://backend:8000' porque Docker resuelve 
+    //Usamos 'http://backend:8000' porque Docker resuelve 
     // el nombre del servicio como si fuera un dominio local.
-    const res = await fetch('http://backend:8000/api/datos', { cache: 'no-store' });
+    const res = await axios.get('http://backend:8000/api/datos');
     
-    if (!res.ok) {
-      throw new Error('Error al conectar con el backend');
-    }
-    
-    return res.json();
+    return res.data;
   } catch (error) {
     console.error(error);
     return null;
