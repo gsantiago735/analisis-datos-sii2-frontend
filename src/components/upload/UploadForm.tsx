@@ -28,7 +28,15 @@ export default function UploadForm() {
     setDragActive(false)
     
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      setFile(e.dataTransfer.files[0])
+      const droppedFile = e.dataTransfer.files[0];
+      setFile(droppedFile);
+      
+      // Sincronizar con el input nativo para que formData lo recoja
+      if (fileInputRef.current) {
+        const dt = new DataTransfer();
+        dt.items.add(droppedFile);
+        fileInputRef.current.files = dt.files;
+      }
     }
   }
 

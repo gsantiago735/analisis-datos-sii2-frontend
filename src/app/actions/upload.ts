@@ -20,6 +20,8 @@ export async function uploadDatasetAction(prevState: any, formData: FormData) {
 
     const apiFormData = new FormData();
     apiFormData.append('file', file);
+    apiFormData.append('nombre', formData.get('nombre') as string);
+    apiFormData.append('descripcion', formData.get('descripcion') as string || '');
 
     const res = await fetch('http://backend:8000/carga/cargar', {
       method: 'POST',
@@ -30,8 +32,13 @@ export async function uploadDatasetAction(prevState: any, formData: FormData) {
     })
 
     if (!res.ok) {
+      if (res.status === 401) {
+        cookieStore.delete('token')
+        cookieStore.delete('role')
+        return { error: 'Tu sesión ha expirado. Por favor recarga la página para iniciar sesión nuevamente.' }
+      }
       const errorData = await res.json().catch(() => null)
-      return { error: errorData?.detail || 'Error al validar el archivo en el servidor.' }
+      return { error: errorData?.detail || 'Error al procesar el archivo en el servidor.' }
     }
 
     const data = await res.json()
