@@ -1,6 +1,7 @@
 'use server'
 
 import { cookies } from 'next/headers'
+import { revalidatePath } from 'next/cache'
 
 const API_URL = process.env.BACKEND_URL || 'http://backend:8000'
 
@@ -64,5 +65,46 @@ export async function getUserDatasetsAction() {
     // que ocurren antes de obtener una respuesta HTTP utilizable.
     console.error('Datasets Error:', error)
     return { error: 'Error de conexión con el servidor.', datasets: [] as DatasetItem[] }
+  }
+}
+
+export async function deleteDatasetAction(formData: FormData) {
+  const datasetId = formData.get('datasetId')
+
+  if (!datasetId) {
+    return { error: 'No se recibió el dataset a eliminar.' }
+  }
+
+  const cookieStore = await cookies()
+  const token = cookieStore.get('token')?.value
+
+  if (!token) {
+    return { error: 'No estás autenticado.' }
+  }
+
+  try {
+    const res = await fetch(`${API_URL}/carga/datasets/${datasetId.toString()}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+
+    if (!res.ok) {
+      if (res.status === 401) {
+        cookieStore.delete('token')
+        cookieStore.delete('role')
+        return { error: 'Tu sesión ha expirado.' }
+      }
+
+      const errorData = await res.json().catch(() => null)
+      return { error: errorData?.detail || 'No se pudo eliminar el dataset.' }
+    }
+
+    revalidatePath('/dashboard')
+    return { success: true }
+  } catch (error) {
+    console.error('Delete Dataset Error:', error)
+    return { error: 'Error de conexión con el servidor.' }
   }
 }

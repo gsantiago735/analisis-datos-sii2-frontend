@@ -3,6 +3,7 @@ import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { Database, HelpCircle, Home, Sigma, Upload, Wand2 } from 'lucide-react'
 import { getUserDatasetsAction } from '@/app/actions/datasets'
+import DeleteDatasetButton from '@/components/datasets/DeleteDatasetButton'
 
 // Formatea la fecha de subida para mostrar una lectura amigable en la tabla.
 // Si el dataset acaba de cargarse, se muestra una referencia relativa breve.
@@ -196,9 +197,7 @@ export default async function DashboardPage() {
                       </td>
                       <td className="px-6 py-5 font-medium text-slate-500">{formatDate(dataset.fecha_subida)}</td>
                       <td className="px-6 py-5 text-right">
-                        <Link href="/upload" className="rounded-lg border border-cyan-200 px-4 py-2 text-xs font-black text-[#0b6685] transition hover:bg-cyan-50">
-                          Seleccionar
-                        </Link>
+                        <DeleteDatasetButton datasetId={dataset.id} datasetName={dataset.nombre} />
                       </td>
                     </tr>
                   ))}
