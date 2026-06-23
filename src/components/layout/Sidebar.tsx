@@ -18,15 +18,15 @@ import {
 import { logoutAction } from '@/app/actions/auth'
 
 const navItems = [
-  { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, roles: ['admin', 'user'] },
+  { name: 'Panel principal', href: '/dashboard', icon: LayoutDashboard, roles: ['analista', 'admin'] },
   { name: 'Panel Administración', href: '/admin', icon: Settings, roles: ['admin'] },
   { name: 'Gestión de Usuarios', href: '/admin/users', icon: Users, roles: ['admin'] },
-  { name: 'Asistente IA', href: '/assistant', icon: Bot, roles: ['admin', 'user'] },
-  { name: 'Subir Datos', href: '/upload', icon: Upload, roles: ['admin', 'user'] },
-  { name: 'Reportes', href: '/report', icon: FileText, roles: ['admin', 'user'] },
-  { name: 'Exp. Correlación', href: '/explorer/correlation', icon: LineChart, roles: ['admin', 'user'] },
-  { name: 'Exp. Frecuencias', href: '/explorer/frequencies', icon: PieChart, roles: ['admin', 'user'] },
-  { name: 'Exp. Tablas Dinámicas', href: '/explorer/pivot', icon: TableProperties, roles: ['admin', 'user'] },
+  { name: 'Asistente IA', href: '/assistant', icon: Bot, roles: ['analista', 'admin'] },
+  { name: 'Subir Datos', href: '/upload', icon: Upload, roles: ['analista', 'admin'] },
+  { name: 'Reportes', href: '/report', icon: FileText, roles: ['analista', 'admin'] },
+  { name: 'Exp. Correlación', href: '/explorer/correlation', icon: LineChart, roles: ['analista', 'admin'] },
+  { name: 'Exp. Frecuencias', href: '/explorer/frequencies', icon: PieChart, roles: ['analista', 'admin'] },
+  { name: 'Exp. Tablas Dinámicas', href: '/explorer/pivot', icon: TableProperties, roles: ['analista', 'admin'] },
 ]
 
 export default function Sidebar({ role }: { role: string }) {

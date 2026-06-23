@@ -7,7 +7,7 @@ export default async function MainLayout({
   children: React.ReactNode
 }) {
   const cookieStore = await cookies()
-  const role = cookieStore.get('role')?.value || 'user'
+  const role = cookieStore.get('role')?.value || ''
 
   return (
     <div className="flex min-h-screen w-full bg-gray-50">
