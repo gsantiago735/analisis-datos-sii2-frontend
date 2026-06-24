@@ -6,7 +6,6 @@ import {
   Database,
   FileSearch,
   Maximize2,
-  RefreshCw,
   Search,
   ShieldCheck,
   Table2,
@@ -25,6 +24,15 @@ type ProfilingPageProps = {
 function formatNumber(value: number) {
   // Aplica formato local a cantidades grandes como registros, nulos y atipicos.
   return new Intl.NumberFormat('es-CO').format(value)
+}
+
+function formatNullableNumber(value?: number | null) {
+  // Muestra guion cuando el backend no envía cuartiles para variables no numéricas.
+  if (value === null || value === undefined) return '—'
+
+  return new Intl.NumberFormat('es-CO', {
+    maximumFractionDigits: 2,
+  }).format(value)
 }
 
 function formatDateTime(value: string) {
@@ -47,6 +55,8 @@ function typeBadgeClass(type: string) {
 export default async function FrequenciesPage({ searchParams }: ProfilingPageProps) {
   const params = await searchParams
   const { datasets, error: datasetsError } = await getUserDatasetsAction()
+
+  // Usa el primer dataset disponible como respaldo cuando la URL no trae uno válido.
   const fallbackDatasetId = datasets[0]?.id ?? 0
   const requestedDatasetId = Number(params?.datasetId || fallbackDatasetId)
   const selectedDatasetId = datasets.some((dataset) => dataset.id === requestedDatasetId) ? requestedDatasetId : fallbackDatasetId
@@ -70,8 +80,12 @@ export default async function FrequenciesPage({ searchParams }: ProfilingPagePro
     )
   }
 
+  // Carga el perfilado del dataset seleccionado y conserva la variable activa de la URL si existe.
   const { profile, error: profileError } = await getDatasetProfileAction(selectedDatasetId, params?.variable)
   const selectedVariable = params?.variable || profile?.variable_detalle?.nombre
+
+  // Normaliza las barras de distribución contra la frecuencia más alta del detalle actual.
+  const maxDistribucion = profile?.variable_detalle?.distribucion.reduce((max, item) => Math.max(max, item.cantidad), 0) ?? 0
 
   return (
     <div className="min-h-screen bg-[#f4f7fb] text-slate-900">
@@ -121,13 +135,9 @@ export default async function FrequenciesPage({ searchParams }: ProfilingPagePro
                 <p className="text-xs font-semibold text-slate-400">Última actualización</p>
                 <p className="text-sm font-black text-slate-700">{profile ? formatDateTime(profile.fecha_subida) : 'N/D'}</p>
               </div>
-              <Link href="/dashboard" className="rounded-lg border border-slate-300 px-5 py-3 text-sm font-black text-slate-700 transition hover:bg-slate-50">
+              <button disabled className="cursor-not-allowed rounded-lg border border-slate-200 bg-slate-50 px-5 py-3 text-sm font-black text-slate-400">
                 Ver detalles del dataset
-              </Link>
-              <Link href={`/explorer/frequencies?datasetId=${selectedDatasetId}`} className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-3 text-sm font-black text-white transition hover:bg-blue-700">
-                <RefreshCw className="h-4 w-4" />
-                Actualizar perfilado
-              </Link>
+              </button>
             </div>
           </div>
         </section>
@@ -139,6 +149,7 @@ export default async function FrequenciesPage({ searchParams }: ProfilingPagePro
         ) : (
           <>
             <section className="mb-5 grid grid-cols-1 gap-4 xl:grid-cols-5">
+              {/* Resumen ejecutivo del perfilado: volumen, tipos y señales principales de calidad. */}
               {[
                 { label: 'Registros', value: formatNumber(profile.resumen.registros), detail: 'Filas analizadas', icon: Table2, tone: 'blue' },
                 { label: 'Variables', value: formatNumber(profile.resumen.variables), detail: `${profile.resumen.numericas} numéricas · ${profile.resumen.categoricas} categóricas · ${profile.resumen.temporales} temporales`, icon: Columns3, tone: 'blue' },
@@ -180,18 +191,21 @@ export default async function FrequenciesPage({ searchParams }: ProfilingPagePro
                 </div>
 
                 <div className="overflow-x-auto">
-                  <table className="w-full min-w-[760px] text-left">
+                  <table className="w-full min-w-[880px] text-left">
                     <thead className="bg-slate-50 text-xs font-black uppercase tracking-wide text-slate-400">
                       <tr>
                         <th className="px-6 py-4">Variable</th>
                         <th className="px-6 py-4">Tipo</th>
                         <th className="px-6 py-4">Nulos</th>
+                        <th className="px-6 py-4">Q1</th>
+                        <th className="px-6 py-4">Q2</th>
+                        <th className="px-6 py-4">Q3</th>
                         <th className="px-6 py-4">Atípicos</th>
-                        <th className="px-6 py-4">Estado</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
                       {profile.variables.map((variable) => {
+                        // La fila activa coincide con el detalle que se muestra en el panel lateral.
                         const isActive = variable.nombre === profile.variable_detalle?.nombre
                         return (
                           <tr key={variable.nombre} className={isActive ? 'bg-blue-50/55' : 'bg-white'}>
@@ -205,15 +219,13 @@ export default async function FrequenciesPage({ searchParams }: ProfilingPagePro
                               <span className={`rounded-full px-3 py-1 text-xs font-black ${typeBadgeClass(variable.tipo)}`}>{variable.tipo}</span>
                             </td>
                             <td className={`px-6 py-4 text-sm font-black ${variable.nulos > 0 ? 'text-red-600' : 'text-slate-400'}`}>
-                              {formatNumber(variable.nulos)} · {variable.porcentaje_nulos}%
+                              {formatNumber(variable.nulos)}
                             </td>
+                            <td className="px-6 py-4 text-sm font-black text-slate-600">{formatNullableNumber(variable.q1)}</td>
+                            <td className="px-6 py-4 text-sm font-black text-slate-600">{formatNullableNumber(variable.q2)}</td>
+                            <td className="px-6 py-4 text-sm font-black text-slate-600">{formatNullableNumber(variable.q3)}</td>
                             <td className={`px-6 py-4 text-sm font-black ${(variable.atipicos || 0) > 0 ? 'text-red-600' : 'text-slate-400'}`}>
-                              {variable.atipicos ?? '—'}{variable.atipicos ? ' · IQR' : ''}
-                            </td>
-                            <td className="px-6 py-4">
-                              <span className={`rounded-full px-3 py-1 text-xs font-black ${variable.estado === 'Correcta' ? 'bg-emerald-50 text-emerald-700' : 'bg-orange-50 text-orange-700'}`}>
-                                {variable.estado}
-                              </span>
+                              {variable.atipicos === null || variable.atipicos === undefined ? '—' : formatNumber(variable.atipicos)}
                             </td>
                           </tr>
                         )
@@ -254,13 +266,14 @@ export default async function FrequenciesPage({ searchParams }: ProfilingPagePro
                   <div className="mt-6">
                     <h3 className="text-sm font-black text-slate-900">Distribución por rangos</h3>
                     <div className="mt-4 space-y-3">
+                      {/* Las barras comparan cantidades absolutas; los porcentajes quedan en la tabla inferior. */}
                       {profile.variable_detalle.distribucion.map((item) => (
                         <div key={item.rango} className="grid grid-cols-[88px_1fr_42px] items-center gap-3 text-xs">
                           <span className="truncate font-medium text-slate-500">{item.rango}</span>
                           <div className="h-2 rounded-full bg-slate-100">
-                            <div className="h-2 rounded-full bg-blue-600" style={{ width: `${Math.min(item.porcentaje, 100)}%` }} />
+                            <div className="h-2 rounded-full bg-blue-600" style={{ width: `${maxDistribucion ? Math.min((item.cantidad / maxDistribucion) * 100, 100) : 0}%` }} />
                           </div>
-                          <span className="text-right font-black text-slate-600">{item.porcentaje}%</span>
+                          <span className="text-right font-black text-slate-600">{formatNumber(item.cantidad)}</span>
                         </div>
                       ))}
                     </div>

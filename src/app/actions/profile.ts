@@ -20,14 +20,20 @@ export type ProfileVariable = {
   tipo: string
   validos: number
   nulos: number
-  porcentaje_nulos: number
+  q1?: number | null
+  q2?: number | null
+  q3?: number | null
   atipicos?: number | null
-  estado: string
 }
 
 export type ProfileRange = {
   rango: string
   porcentaje: number
+}
+
+export type ProfileDistribution = {
+  rango: string
+  cantidad: number
 }
 
 export type ProfileDetail = {
@@ -36,7 +42,7 @@ export type ProfileDetail = {
   validos: number
   nulos: number
   estadisticas: { etiqueta: string; valor: string }[]
-  distribucion: ProfileRange[]
+  distribucion: ProfileDistribution[]
   porcentajes: ProfileRange[]
 }
 
