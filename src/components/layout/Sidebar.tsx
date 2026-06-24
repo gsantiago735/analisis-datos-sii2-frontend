@@ -21,12 +21,12 @@ const navItems = [
   { name: 'Panel principal', href: '/dashboard', icon: LayoutDashboard, roles: ['analista', 'admin'] },
   { name: 'Panel Administración', href: '/admin', icon: Settings, roles: ['admin'] },
   { name: 'Gestión de Usuarios', href: '/admin/users', icon: Users, roles: ['admin'] },
-  { name: 'Asistente IA', href: '/assistant', icon: Bot, roles: ['analista', 'admin'] },
   { name: 'Subir Datos', href: '/upload', icon: Upload, roles: ['analista', 'admin'] },
-  { name: 'Reportes', href: '/report', icon: FileText, roles: ['analista', 'admin'] },
-  { name: 'Exp. Correlación', href: '/explorer/correlation', icon: LineChart, roles: ['analista', 'admin'] },
   { name: 'Perfilado de Datos', href: '/explorer/frequencies', icon: PieChart, roles: ['analista', 'admin'] },
-  { name: 'Exp. Tablas Dinámicas', href: '/explorer/pivot', icon: TableProperties, roles: ['analista', 'admin'] },
+  { name: 'Asistente IA', href: '/assistant', icon: Bot, roles: ['analista', 'admin'], disabled: true },
+  { name: 'Reportes', href: '/report', icon: FileText, roles: ['analista', 'admin'], disabled: true },
+  { name: 'Exp. Correlación', href: '/explorer/correlation', icon: LineChart, roles: ['analista', 'admin'], disabled: true },
+  { name: 'Exp. Tablas Dinámicas', href: '/explorer/pivot', icon: TableProperties, roles: ['analista', 'admin'], disabled: true },
 ]
 
 export default function Sidebar({ role }: { role: string }) {
@@ -48,6 +48,20 @@ export default function Sidebar({ role }: { role: string }) {
         {visibleItems.map((item) => {
           const isActive = pathname === item.href
           const Icon = item.icon
+
+          if (item.disabled) {
+            return (
+              <button
+                key={item.name}
+                disabled
+                title="Disponible próximamente"
+                className="flex w-full cursor-not-allowed items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium text-gray-300"
+              >
+                <Icon className="h-5 w-5 shrink-0" />
+                {item.name}
+              </button>
+            )
+          }
           
           return (
             <Link 
