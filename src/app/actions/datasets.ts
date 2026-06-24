@@ -19,6 +19,28 @@ export type DatasetItem = {
   estado: string
 }
 
+export type DatasetContent = {
+  id: number
+  nombre: string
+  descripcion?: string | null
+  nombre_archivo?: string | null
+  formato: string
+  total_filas: number
+  total_columnas: number
+  current_page: number
+  number_of_records: number
+  total_pages: number
+  has_previous_page: boolean
+  has_next_page: boolean
+  columnas: string[]
+  filas: Record<string, string | number | boolean | null>[]
+}
+
+export type DatasetContentParams = {
+  page?: number
+  numberOfRecords?: number
+}
+
 export async function getUserDatasetsAction() {
   // Al ser una server action, puede leer cookies httpOnly sin exponer el token
   // al JavaScript del navegador.
@@ -65,6 +87,48 @@ export async function getUserDatasetsAction() {
     // que ocurren antes de obtener una respuesta HTTP utilizable.
     console.error('Datasets Error:', error)
     return { error: 'Error de conexión con el servidor.', datasets: [] as DatasetItem[] }
+  }
+}
+
+export async function getDatasetContentAction(datasetId: number, params: DatasetContentParams = {}) {
+  const cookieStore = await cookies()
+  const token = cookieStore.get('token')?.value
+
+  if (!token) {
+    return { error: 'No estás autenticado.' }
+  }
+
+  try {
+    const query = new URLSearchParams()
+    const page = params.page ?? 1
+    const numberOfRecords = params.numberOfRecords ?? 25
+    query.set('page', String(page))
+    query.set('current_page', String(page))
+    query.set('number_of_records', String(numberOfRecords))
+
+    const res = await fetch(`${API_URL}/carga/datasets/${datasetId}/contenido?${query.toString()}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      cache: 'no-store',
+    })
+
+    if (!res.ok) {
+      if (res.status === 401) {
+        cookieStore.delete('token')
+        cookieStore.delete('role')
+        return { error: 'Tu sesión ha expirado.' }
+      }
+
+      const errorData = await res.json().catch(() => null)
+      return { error: errorData?.detail || 'No se pudo cargar el contenido del dataset.' }
+    }
+
+    const dataset = await res.json()
+    return { dataset: dataset as DatasetContent }
+  } catch (error) {
+    console.error('Dataset Content Error:', error)
+    return { error: 'Error de conexión con el servidor.' }
   }
 }
 

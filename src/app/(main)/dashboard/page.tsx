@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { Database, HelpCircle, Home, Sigma, Upload, Wand2 } from 'lucide-react'
+import { Database, Eye, HelpCircle, Home, Sigma, Upload, Wand2 } from 'lucide-react'
 import { getUserDatasetsAction } from '@/app/actions/datasets'
 import DeleteDatasetButton from '@/components/datasets/DeleteDatasetButton'
 
@@ -196,8 +196,18 @@ export default async function DashboardPage() {
                         </span>
                       </td>
                       <td className="px-6 py-5 font-medium text-slate-500">{formatDate(dataset.fecha_subida)}</td>
-                      <td className="px-6 py-5 text-right">
-                        <DeleteDatasetButton datasetId={dataset.id} datasetName={dataset.nombre} />
+                      <td className="px-6 py-5">
+                        <div className="flex items-center justify-end gap-2">
+                          <Link
+                            href={`/datasets/${dataset.id}`}
+                            className="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 text-[#0b6685] transition hover:bg-cyan-50"
+                            title="Visualizar"
+                            aria-label={`Visualizar ${dataset.nombre}`}
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Link>
+                          <DeleteDatasetButton datasetId={dataset.id} datasetName={dataset.nombre} />
+                        </div>
                       </td>
                     </tr>
                   ))}

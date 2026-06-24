@@ -1,10 +1,12 @@
 'use client'
 
 import { useState, useRef, useActionState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { UploadCloud, File as FileIcon, X } from 'lucide-react'
 import { uploadDatasetAction } from '@/app/actions/upload'
 
 export default function UploadForm() {
+  const router = useRouter()
   const [file, setFile] = useState<File | null>(null)
   const [dragActive, setDragActive] = useState(false)
   
@@ -54,15 +56,15 @@ export default function UploadForm() {
     }
   }
 
-  // Clear file if upload was successful
   useEffect(() => {
-    if (state?.success) {
+    if (state?.success && state.data?.dataset_id) {
       setFile(null)
       if (fileInputRef.current) {
         fileInputRef.current.value = ''
       }
+      router.push(`/datasets/${state.data.dataset_id}?created=1`)
     }
-  }, [state])
+  }, [router, state])
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
@@ -78,12 +80,6 @@ export default function UploadForm() {
             {state.error}
           </div>
         )}
-        {state?.success && (
-          <div className="p-4 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-lg text-sm">
-            ¡Éxito! Archivo validado y cargado correctamente: {state.data?.archivoCargado}
-          </div>
-        )}
-
         {/* Drag & Drop Area */}
         <div 
           className={`relative flex flex-col items-center justify-center p-10 border-2 border-dashed rounded-xl transition-colors ${
