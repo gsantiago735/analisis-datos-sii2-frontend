@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   // 1. Obtener el token y el rol guardados en las cookies tras el login
   const token = request.cookies.get('token')?.value
   const userRole = request.cookies.get('role')?.value
@@ -24,5 +24,5 @@ export function middleware(request: NextRequest) {
 
 // Configura qué rutas va a proteger este middleware
 export const config = {
-  matcher: ['/dashboard/:path*', '/admin/:path*', '/explorer/:path*', '/assistant/:path*', '/report/:path*'],
+  matcher: ['/dashboard/:path*', '/admin/:path*', '/explorer/:path*', '/assistant/:path*', '/report/:path*', '/upload/:path*'],
 }
