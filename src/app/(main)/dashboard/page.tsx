@@ -38,9 +38,9 @@ const modules = [
     icon: Wand2,
   },
   {
-    title: 'Estadísticas descriptivas',
-    description: 'Calcula mínimos, máximos, cuartiles, promedio y desviación estándar.',
-    href: '/report',
+    title: 'Visualizar Frecuencias',
+    description: 'Visualización de métricas y distribuciones de los dataset',
+    href: '/frecuencias',
     icon: Sigma,
   },
 ]
