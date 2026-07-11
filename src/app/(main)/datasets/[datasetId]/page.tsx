@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { ArrowLeft, ChevronLeft, ChevronRight, Database, FileSpreadsheet, Rows3, Table2 } from 'lucide-react'
+import { ArrowLeft, Bot, ChevronLeft, ChevronRight, Database, FileSpreadsheet, Rows3, Table2 } from 'lucide-react'
 import { getDatasetContentAction } from '@/app/actions/datasets'
 import DatasetCreatedNotice from '@/components/datasets/DatasetCreatedNotice'
 
@@ -108,6 +108,10 @@ export default async function DatasetViewPage({ params, searchParams }: DatasetV
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-3">
+            <Link href={`/assistant?datasetId=${dataset.id}`} className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-3 text-sm font-black text-white transition hover:bg-blue-700">
+              <Bot className="h-4 w-4" />
+              Preguntar
+            </Link>
             <span className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm font-black text-[#0b3d63] shadow-sm">
               <FileSpreadsheet className="h-4 w-4 text-[#0b6685]" />
               {dataset.nombre_archivo || 'Archivo'}
