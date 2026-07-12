@@ -98,7 +98,7 @@ export default function LoginForm() {
       {/* Sección: recuperación de contraseña */}
       <div className="flex justify-end">
         <button type="button" className="mt-3 text-xs font-semibold text-teal-700 transition hover:text-teal-600">
-          ¿Olvidaste tu dd contraseña?
+          ¿Olvidaste tu contraseña?
         </button>
       </div>
 
