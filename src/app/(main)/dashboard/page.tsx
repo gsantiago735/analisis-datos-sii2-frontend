@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { Database, Eye, HelpCircle, Home, Sigma, Upload, Wand2 } from 'lucide-react'
+import { Bot, Database, Eye, HelpCircle, Home, MessageCircle, Sigma, Upload, Wand2 } from 'lucide-react'
 import { getUserDatasetsAction } from '@/app/actions/datasets'
 import DeleteDatasetButton from '@/components/datasets/DeleteDatasetButton'
 
@@ -42,6 +42,12 @@ const modules = [
     description: 'Visualización de métricas y distribuciones de los dataset',
     href: '/frecuencias',
     icon: Sigma,
+  },
+  {
+    title: 'Asistente IA',
+    description: 'Haz preguntas en lenguaje natural usando el perfilado del dataset.',
+    href: '/assistant',
+    icon: Bot,
   },
 ]
 
@@ -122,7 +128,7 @@ export default async function DashboardPage() {
         </div>
 
         {/* Sección de módulos: tarjetas de navegación disponibles para el rol analista. */}
-        <section className="grid grid-cols-1 gap-5 lg:grid-cols-3">
+        <section className="grid grid-cols-1 gap-5 lg:grid-cols-4">
           {modules.map((module) => {
             const Icon = module.icon
 
@@ -136,7 +142,10 @@ export default async function DashboardPage() {
                   <h3 className="text-xl font-black text-[#0b3d63]">{module.title}</h3>
                   <p className="mt-3 min-h-12 text-sm font-medium leading-6 text-slate-500">{module.description}</p>
                   <div className="mt-6 flex items-center justify-between">
-                    <Link href={module.href} className="rounded-lg border border-cyan-200 px-4 py-2 text-sm font-black text-[#0b6685] transition hover:bg-cyan-50">
+                    <Link
+                      href={module.href === '/assistant' && activeDataset ? `/assistant?datasetId=${activeDataset.id}` : module.href}
+                      className="rounded-lg border border-cyan-200 px-4 py-2 text-sm font-black text-[#0b6685] transition hover:bg-cyan-50"
+                    >
                       Abrir módulo
                     </Link>
                     <span className="text-xs font-black text-teal-600">Disponible</span>
@@ -205,6 +214,14 @@ export default async function DashboardPage() {
                             aria-label={`Visualizar ${dataset.nombre}`}
                           >
                             <Eye className="h-4 w-4" />
+                          </Link>
+                          <Link
+                            href={`/assistant?datasetId=${dataset.id}`}
+                            className="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 text-[#0b6685] transition hover:bg-cyan-50"
+                            title="Preguntar al asistente"
+                            aria-label={`Preguntar sobre ${dataset.nombre}`}
+                          >
+                            <MessageCircle className="h-4 w-4" />
                           </Link>
                           <DeleteDatasetButton datasetId={dataset.id} datasetName={dataset.nombre} />
                         </div>

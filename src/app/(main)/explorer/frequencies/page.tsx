@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import {
   AlertTriangle,
+  Bot,
   CheckCircle2,
   Columns3,
   Database,
@@ -138,6 +139,12 @@ export default async function FrequenciesPage({ searchParams }: ProfilingPagePro
               <button disabled className="cursor-not-allowed rounded-lg border border-slate-200 bg-slate-50 px-5 py-3 text-sm font-black text-slate-400">
                 Ver detalles del dataset
               </button>
+              <Link href={`/assistant?datasetId=${selectedDatasetId}`} className="rounded-lg bg-blue-600 px-5 py-3 text-sm font-black text-white transition hover:bg-blue-700">
+                <span className="inline-flex items-center gap-2">
+                  <Bot className="h-4 w-4" />
+                  Preguntar
+                </span>
+              </Link>
             </div>
           </div>
         </section>
