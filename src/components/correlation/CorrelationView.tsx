@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useTransition, useMemo } from 'react'
-import { AlertTriangle, Loader2, Play, Star, TrendingUp } from 'lucide-react'
+import { AlertTriangle, Info, Loader2, Play, Star, TrendingUp } from 'lucide-react'
 import { generateCorrelationAction } from '@/app/actions/correlation'
 import type { CorrelationResult } from '@/app/actions/correlation'
 import type { DatasetItem } from '@/app/actions/datasets'
@@ -106,6 +106,7 @@ export default function CorrelationView({ datasets }: Props) {
               <select
                 value={metodo}
                 onChange={(e) => setMetodo(e.target.value as typeof metodo)}
+                aria-describedby="correlation-method-hint"
                 className="h-10 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm font-semibold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
               >
                 <option value="pearson">Pearson</option>
@@ -113,11 +114,18 @@ export default function CorrelationView({ datasets }: Props) {
                 <option value="kendall">Kendall</option>
               </select>
             </label>
-            <p className="mt-2 text-xs text-slate-400 leading-relaxed">
-              {metodo === 'pearson' && 'Mide relaciones lineales entre variables numéricas continuas. Ideal cuando los datos siguen una distribución normal.'}
-              {metodo === 'spearman' && 'Mide relaciones monotónicas usando rangos. Más robusto ante valores atípicos y datos no normales.'}
-              {metodo === 'kendall' && 'Mide concordancia entre pares de observaciones. Recomendado para muestras pequeñas o con muchos empates.'}
-            </p>
+            <div
+              id="correlation-method-hint"
+              aria-live="polite"
+              className="mt-2 flex items-start gap-2 rounded-lg border border-blue-100 bg-blue-50 px-3 py-2.5 text-xs leading-relaxed text-blue-700"
+            >
+              <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+              <p>
+                {metodo === 'pearson' && 'Pearson mide relaciones lineales entre variables numéricas continuas. Es apropiado cuando los datos son aproximadamente normales y no presentan valores atípicos importantes.'}
+                {metodo === 'spearman' && 'Spearman mide relaciones monotónicas mediante rangos. Es más robusto ante valores atípicos y no requiere que los datos sigan una distribución normal.'}
+                {metodo === 'kendall' && 'Kendall mide la concordancia entre pares de observaciones. Es recomendable para muestras pequeñas o datos con numerosos valores empatados.'}
+              </p>
+            </div>
           </div>
 
           <div>
@@ -126,16 +134,24 @@ export default function CorrelationView({ datasets }: Props) {
               <select
                 value={estrategia}
                 onChange={(e) => setEstrategia(e.target.value as typeof estrategia)}
+                aria-describedby="null-strategy-hint"
                 className="h-10 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm font-semibold text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
               >
                 <option value="ignorar">Ignorar</option>
                 <option value="eliminar">Eliminar</option>
               </select>
             </label>
-            <p className="mt-2 text-xs text-slate-400 leading-relaxed">
-              {estrategia === 'ignorar' && 'Calcula cada par de variables usando solo las filas con valores completos en ambas. Conserva más datos.'}
-              {estrategia === 'eliminar' && 'Elimina todas las filas que tengan al menos un valor nulo. Garantiza consistencia pero puede reducir la muestra.'}
-            </p>
+            <div
+              id="null-strategy-hint"
+              aria-live="polite"
+              className="mt-2 flex items-start gap-2 rounded-lg border border-blue-100 bg-blue-50 px-3 py-2.5 text-xs leading-relaxed text-blue-700"
+            >
+              <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+              <p>
+                {estrategia === 'ignorar' && 'Ignorar calcula cada correlación con las filas que tienen datos completos para ese par de variables. Conserva más información, aunque cada coeficiente puede usar una cantidad distinta de registros.'}
+                {estrategia === 'eliminar' && 'Eliminar descarta cualquier fila que tenga al menos un valor nulo antes de calcular la matriz. Todos los coeficientes usan la misma muestra, pero podrían perderse muchos registros.'}
+              </p>
+            </div>
           </div>
 
           <button
@@ -194,7 +210,10 @@ export default function CorrelationView({ datasets }: Props) {
               </div>
 
               <div className="overflow-x-auto">
-                <div style={{ display: 'inline-block', minWidth: 'max-content' }}>
+                {/* La matriz se centra cuando ocupa menos ancho que la tarjeta.
+                    max-content conserva el scroll horizontal en datasets con
+                    muchas variables, sin comprimir las celdas ni etiquetas. */}
+                <div style={{ width: 'max-content', minWidth: 'max-content', marginInline: 'auto' }}>
                   {/* Column headers */}
                   <div className="flex" style={{ marginLeft: 144 }}>
                     {variables.map((v) => (
