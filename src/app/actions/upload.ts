@@ -15,7 +15,7 @@ export async function uploadDatasetAction(prevState: any, formData: FormData) {
     const token = cookieStore.get('token')?.value
 
     if (!token) {
-      return { error: 'No estás autenticado.' }
+      return { sessionExpired: true }
     }
 
     const apiFormData = new FormData();
@@ -23,7 +23,8 @@ export async function uploadDatasetAction(prevState: any, formData: FormData) {
     apiFormData.append('nombre', formData.get('nombre') as string);
     apiFormData.append('descripcion', formData.get('descripcion') as string || '');
 
-    const res = await fetch('http://backend:8000/carga/cargar', {
+    const API_URL = process.env.BACKEND_URL || 'http://backend:8000'
+    const res = await fetch(`${API_URL}/carga/cargar`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`
@@ -35,7 +36,7 @@ export async function uploadDatasetAction(prevState: any, formData: FormData) {
       if (res.status === 401) {
         cookieStore.delete('token')
         cookieStore.delete('role')
-        return { error: 'Tu sesión ha expirado. Por favor recarga la página para iniciar sesión nuevamente.' }
+        return { sessionExpired: true }
       }
       const errorData = await res.json().catch(() => null)
       return { error: errorData?.detail || 'Error al procesar el archivo en el servidor.' }

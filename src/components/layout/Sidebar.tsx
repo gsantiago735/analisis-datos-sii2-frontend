@@ -24,8 +24,8 @@ const navItems = [
   { name: 'Subir Datos', href: '/upload', icon: Upload, roles: ['analista', 'admin'] },
   { name: 'Perfilado de Datos', href: '/explorer/frequencies', icon: PieChart, roles: ['analista', 'admin'] },
   { name: 'Asistente IA', href: '/assistant', icon: Bot, roles: ['analista', 'admin'] },
-  { name: 'Reportes', href: '/report', icon: FileText, roles: ['analista', 'admin'], disabled: true },
-  { name: 'Exp. Correlación', href: '/explorer/correlation', icon: LineChart, roles: ['analista', 'admin'], disabled: true },
+  { name: 'Resumen ejecutivo', href: '/executive-summary', icon: FileText, roles: ['analista', 'admin'] },
+  { name: 'Exp. Correlación', href: '/explorer/correlation', icon: LineChart, roles: ['analista', 'admin']},
   { name: 'Exp. Tablas Dinámicas', href: '/explorer/pivot', icon: TableProperties, roles: ['analista', 'admin'], disabled: true },
 ]
 

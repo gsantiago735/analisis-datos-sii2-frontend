@@ -57,6 +57,13 @@ export default function UploadForm() {
   }
 
   useEffect(() => {
+    if (state?.sessionExpired) {
+      // replace evita que el botón "Atrás" regrese a una vista cuya sesión ya
+      // no es válida. El login usa el motivo para mostrar el mensaje adecuado.
+      router.replace('/login?reason=session-expired')
+      return
+    }
+
     if (state?.success && state.data?.dataset_id) {
       setFile(null)
       if (fileInputRef.current) {
