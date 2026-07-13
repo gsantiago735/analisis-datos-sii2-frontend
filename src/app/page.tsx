@@ -6,7 +6,8 @@ async function getBackendData() {
   try {
     //Usamos 'http://backend:8000' porque Docker resuelve 
     // el nombre del servicio como si fuera un dominio local.
-    const res = await axios.get('http://backend:8000/api/datos');
+    const API_URL = process.env.BACKEND_URL || 'http://backend:8000'
+    const res = await axios.get(`${API_URL}/api/datos`);
     
     return res.data;
   } catch (error) {

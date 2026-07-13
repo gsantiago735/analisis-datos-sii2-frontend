@@ -23,7 +23,8 @@ export async function uploadDatasetAction(prevState: any, formData: FormData) {
     apiFormData.append('nombre', formData.get('nombre') as string);
     apiFormData.append('descripcion', formData.get('descripcion') as string || '');
 
-    const res = await fetch('http://backend:8000/carga/cargar', {
+    const API_URL = process.env.BACKEND_URL || 'http://backend:8000'
+    const res = await fetch(`${API_URL}/carga/cargar`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`
