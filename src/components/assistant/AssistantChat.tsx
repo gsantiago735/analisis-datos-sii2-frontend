@@ -108,7 +108,6 @@ export default function AssistantChat({ datasets, selectedDatasetId }: Assistant
           <div className="mt-5 rounded-xl border border-slate-200 bg-slate-50 p-4">
             <p className="text-sm font-black text-slate-800">{selectedDataset.nombre}</p>
             <p className="mt-1 text-xs font-medium text-slate-500">{selectedDataset.nombre_archivo || 'Sin archivo asociado'}</p>
-            <p className="mt-3 text-xs font-black text-blue-600">dataset_id: {selectedDataset.id}</p>
           </div>
         )}
       </aside>
@@ -146,7 +145,6 @@ export default function AssistantChat({ datasets, selectedDatasetId }: Assistant
                     <p className="whitespace-pre-wrap text-sm font-medium leading-7 text-slate-800">
                       {renderInlineMarkdown(message.answer)}
                     </p>
-                    <p className="mt-3 text-xs font-semibold text-slate-400">Dataset ID {message.dataset_id}</p>
                   </div>
                 </div>
               </article>
