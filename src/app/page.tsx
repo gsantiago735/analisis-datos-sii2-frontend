@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 import axios from 'axios';
 
 // Función para obtener los datos desde el backend de Docker
@@ -6,7 +7,8 @@ async function getBackendData() {
   try {
     //Usamos 'http://backend:8000' porque Docker resuelve 
     // el nombre del servicio como si fuera un dominio local.
-    const res = await axios.get('http://backend:8000/api/datos');
+    const API_URL = process.env.BACKEND_URL || 'http://backend:8000'
+    const res = await axios.get(`${API_URL}/api/datos`);
     
     return res.data;
   } catch (error) {
@@ -46,6 +48,12 @@ export default async function HomePage() {
             </p>
           </div>
         )}
+        <Link
+          href="/login"
+          className="mt-6 inline-block px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors"
+        >
+          Ir al Login
+        </Link>
       </div>
     </main>
   );
