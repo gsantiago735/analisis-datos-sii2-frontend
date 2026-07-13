@@ -17,6 +17,8 @@ export type DatasetItem = {
   fecha_subida: string
   formato: string
   estado: string
+  resumen_ejecutivo_disponible: boolean
+  resumen_ejecutivo_url?: string | null
 }
 
 export type DatasetContent = {
@@ -34,6 +36,15 @@ export type DatasetContent = {
   has_next_page: boolean
   columnas: string[]
   filas: Record<string, string | number | boolean | null>[]
+  resumen_ejecutivo_disponible: boolean
+  resumen_ejecutivo_url?: string | null
+}
+
+export type ExecutiveSummaryActionResult = {
+  success?: boolean
+  error?: string
+  errorCode?: 'profile_required' | 'service_unavailable' | 'unknown'
+  downloadUrl?: string
 }
 
 export type DatasetContentParams = {
@@ -170,5 +181,60 @@ export async function deleteDatasetAction(formData: FormData) {
   } catch (error) {
     console.error('Delete Dataset Error:', error)
     return { error: 'Error de conexión con el servidor.' }
+  }
+}
+
+export async function generateExecutiveSummaryAction(datasetId: number): Promise<ExecutiveSummaryActionResult> {
+  if (!Number.isInteger(datasetId) || datasetId <= 0) {
+    return { error: 'El dataset no es válido.', errorCode: 'unknown' }
+  }
+
+  const cookieStore = await cookies()
+  const token = cookieStore.get('token')?.value
+
+  if (!token) {
+    return { error: 'No estás autenticado.', errorCode: 'unknown' }
+  }
+
+  try {
+    const res = await fetch(`${API_URL}/resumen/datasets/${datasetId}`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      cache: 'no-store',
+    })
+
+    if (!res.ok) {
+      if (res.status === 401) {
+        cookieStore.delete('token')
+        cookieStore.delete('role')
+        return { error: 'Tu sesión ha expirado.', errorCode: 'unknown' }
+      }
+
+      const errorData = await res.json().catch(() => null)
+      const errorCode = res.status === 409
+        ? 'profile_required'
+        : res.status === 503
+          ? 'service_unavailable'
+          : 'unknown'
+
+      return {
+        error: errorData?.detail || 'No se pudo generar el resumen ejecutivo.',
+        errorCode,
+      }
+    }
+
+    revalidatePath('/dashboard')
+    revalidatePath(`/datasets/${datasetId}`)
+
+    return {
+      success: true,
+      downloadUrl: `/api/datasets/${datasetId}/resumen-ejecutivo`,
+    }
+  } catch (error) {
+    console.error('Executive Summary Error:', error)
+    return {
+      error: 'Error de conexión con el servidor.',
+      errorCode: 'service_unavailable',
+    }
   }
 }
