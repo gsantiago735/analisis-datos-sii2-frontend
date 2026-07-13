@@ -10,6 +10,7 @@ import {
   LineChart,
   PieChart,
   TableProperties,
+  BarChart2,
   Settings,
   Users,
   LogOut
@@ -27,6 +28,7 @@ const navItems = [
   { name: 'Resumen ejecutivo', href: '/executive-summary', icon: FileText, roles: ['analista', 'admin'] },
   { name: 'Exp. Correlación', href: '/explorer/correlation', icon: LineChart, roles: ['analista', 'admin']},
   { name: 'Exp. Tablas Dinámicas', href: '/explorer/pivot', icon: TableProperties, roles: ['analista', 'admin'] },
+  { name: 'Visualizador de frecuencias', href: '/frecuencias', icon: BarChart2, roles: ['analista', 'admin'] },
 ]
 
 export default function Sidebar({ role }: { role: string }) {
