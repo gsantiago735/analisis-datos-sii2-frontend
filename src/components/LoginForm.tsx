@@ -6,9 +6,13 @@ import { useRouter } from 'next/navigation'
 import { loginAction } from '@/app/actions/auth'
 import { Eye, EyeOff, Lock, Mail } from 'lucide-react'
 
-export default function LoginForm() {
+type LoginFormProps = {
+  initialError?: string | null
+}
+
+export default function LoginForm({ initialError = null }: LoginFormProps) {
   const router = useRouter()
-  const [error, setError] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(initialError)
   const [isPending, setIsPending] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
 

@@ -15,7 +15,7 @@ export async function uploadDatasetAction(prevState: any, formData: FormData) {
     const token = cookieStore.get('token')?.value
 
     if (!token) {
-      return { error: 'No estás autenticado.' }
+      return { sessionExpired: true }
     }
 
     const apiFormData = new FormData();
@@ -35,7 +35,7 @@ export async function uploadDatasetAction(prevState: any, formData: FormData) {
       if (res.status === 401) {
         cookieStore.delete('token')
         cookieStore.delete('role')
-        return { error: 'Tu sesión ha expirado. Por favor recarga la página para iniciar sesión nuevamente.' }
+        return { sessionExpired: true }
       }
       const errorData = await res.json().catch(() => null)
       return { error: errorData?.detail || 'Error al procesar el archivo en el servidor.' }
