@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 import axios from 'axios';
 
 // Función para obtener los datos desde el backend de Docker
@@ -47,6 +48,12 @@ export default async function HomePage() {
             </p>
           </div>
         )}
+        <Link
+          href="/login"
+          className="mt-6 inline-block px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors"
+        >
+          Ir al Login
+        </Link>
       </div>
     </main>
   );
