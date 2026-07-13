@@ -1,6 +1,7 @@
 'use client'
 
 import { FormEvent, useEffect, useMemo, useRef, useState, useTransition } from 'react'
+import type { ReactNode } from 'react'
 import { Bot, Loader2, Send, Sparkles } from 'lucide-react'
 import { askAssistantAction } from '@/app/actions/assistant'
 import type { AssistantAnswer } from '@/app/actions/assistant'
@@ -9,6 +10,28 @@ import type { DatasetItem } from '@/app/actions/datasets'
 type AssistantChatProps = {
   datasets: DatasetItem[]
   selectedDatasetId: number
+}
+
+/**
+ * Interpreta únicamente énfasis Markdown en las respuestas del asistente.
+ * React escapa el contenido de cada fragmento, por lo que no se inyecta HTML
+ * procedente del modelo ni se necesita usar dangerouslySetInnerHTML.
+ */
+function renderInlineMarkdown(text: string): ReactNode[] {
+  return text
+    .split(/(\*\*[^*\n]+\*\*|\*(?![\s*])[^*\n]+\*)/g)
+    .filter(Boolean)
+    .map((fragment, index) => {
+      if (fragment.startsWith('**') && fragment.endsWith('**')) {
+        return <strong key={index} className="font-black">{fragment.slice(2, -2)}</strong>
+      }
+
+      if (fragment.startsWith('*') && fragment.endsWith('*')) {
+        return <em key={index}>{fragment.slice(1, -1)}</em>
+      }
+
+      return fragment
+    })
 }
 
 export default function AssistantChat({ datasets, selectedDatasetId }: AssistantChatProps) {
@@ -120,7 +143,9 @@ export default function AssistantChat({ datasets, selectedDatasetId }: Assistant
                     <Bot className="h-4 w-4" />
                   </span>
                   <div className="rounded-2xl rounded-tl-md border border-slate-200 bg-white px-5 py-4 shadow-sm">
-                    <p className="whitespace-pre-wrap text-sm font-medium leading-7 text-slate-800">{message.answer}</p>
+                    <p className="whitespace-pre-wrap text-sm font-medium leading-7 text-slate-800">
+                      {renderInlineMarkdown(message.answer)}
+                    </p>
                     <p className="mt-3 text-xs font-semibold text-slate-400">Dataset ID {message.dataset_id}</p>
                   </div>
                 </div>
