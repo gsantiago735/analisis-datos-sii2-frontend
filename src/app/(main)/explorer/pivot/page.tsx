@@ -1,8 +1,11 @@
-export default function PivotPage() {
-  return (
-    <div className="p-8">
-      <h1 className="text-2xl font-bold mb-4">Tablas Dinámicas</h1>
-      <p >Explorador de tablas dinámicas en construcción...</p>
-    </div>
-  );
+// Ejemplo de uso con App Router.
+// Copia esto como: app/tablas-dinamicas/page.tsx
+// (Ya NO lleva segmento dinámico [datasetId]: el dataset se elige desde un
+// <select> dentro del propio componente, alimentado por getUserDatasetsAction.)
+
+import TablaDinamicaBuilder from "./TablaDinamicaBuilder";
+
+
+export default function Page() {
+  return <TablaDinamicaBuilder />;
 }
