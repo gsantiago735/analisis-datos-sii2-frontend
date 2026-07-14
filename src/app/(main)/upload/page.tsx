@@ -49,12 +49,6 @@ export default function UploadPage() {
               <span className="px-3 py-1 bg-gray-50 border border-gray-200 rounded-md text-xs font-semibold text-gray-600">TXT</span>
               <span className="px-3 py-1 bg-gray-50 border border-gray-200 rounded-md text-xs font-semibold text-gray-600">DAT</span>
             </div>
-
-            <div className="mt-6 p-4 bg-emerald-50/50 border border-emerald-100 rounded-lg">
-              <p className="text-xs text-emerald-800 font-medium leading-relaxed">
-                No se solicita tamaño máximo, separador, codificación ni vista previa en esta versión.
-              </p>
-            </div>
           </div>
         </div>
       </div>
