@@ -1,23 +1,52 @@
-FROM node:lts-alpine
+FROM node:lts-alpine AS base
 
+# --- Dependencias ---
+FROM base AS deps
 WORKDIR /app
-
-# Copiar archivos de dependencias
 COPY package.json package-lock.json* pnpm-lock.yaml* bun.lockb* ./
-
-# Instalar dependencias según el gestor que elegiste
 RUN \
-  if [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm i; \
-  elif [ -f bun.lockb ]; then id -u bun &>/dev/null || adduser -D bun && chown -R bun /app && npm install -g bun && bun install; \
+  if [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm i --frozen-lockfile; \
+  elif [ -f bun.lockb ]; then npm install -g bun && bun install --frozen-lockfile; \
   elif [ -f package-lock.json ]; then npm ci; \
   else npm install; \
   fi
 
-# Copiar el resto del código
+# --- Build ---
+FROM base AS builder
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+ENV NEXT_TELEMETRY_DISABLED=1
 
-# Exponer el puerto por defecto de Next.js
+# Declara aquí cada variable NEXT_PUBLIC_* que uses
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+
+ARG NEXT_PUBLIC_BACKEND_URL 
+ENV NEXT_PUBLIC_BACKEND_URL=$NEXT_PUBLIC_API_URL
+
+# Agrega más si tienes, por ejemplo:
+# ARG NEXT_PUBLIC_ANALYTICS_ID
+# ENV NEXT_PUBLIC_ANALYTICS_ID=$NEXT_PUBLIC_ANALYTICS_ID
+
+RUN npm run build
+
+# --- Runtime ---
+FROM base AS runner
+WORKDIR /app
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 nextjs
+
+COPY --from=builder /app/public ./public
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+USER nextjs
 EXPOSE 3000
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
 
-# Comando para desarrollo
-CMD ["npm", "run", "dev"]
+CMD ["node", "server.js"]
