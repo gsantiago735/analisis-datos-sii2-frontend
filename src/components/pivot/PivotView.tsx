@@ -268,9 +268,11 @@ export default function PivotView({ datasets }: Props) {
       {/* Results panel */}
       <main className="p-6 lg:p-8">
         {error && (
-          <div className="mb-6 flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-700">
-            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
-            {error}
+          <div className="flex h-64 flex-col items-center justify-center gap-3">
+            <div className="flex max-w-lg items-start gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-700">
+              <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+              {error}
+            </div>
           </div>
         )}
 
